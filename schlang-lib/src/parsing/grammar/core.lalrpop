@@ -1,0 +1,25 @@
+use crate::parsing::types::{Function, Program, Statement, Expression};
+use crate::common_types::{Identifier};
+
+grammar;
+
+Int: i64 = <s:r"[-]?\d+"> => s.parse::<i64>().unwrap();
+Ident: Identifier = <s:r"[a-zA-Z](([a-zA-Z0-9]|-|_)*([a-zA-Z0-9]))*"> => Identifier(s.to_string());
+
+pub Prgr: Program = {
+    <funcs: Func*> => Program { functions: funcs }
+}
+
+Func: Function = {
+    "fn" <id: Ident> "("  ")" "{" <stmts: Stmt*> "}" => Function { name: id, statements: stmts }
+}
+
+Expr: Expression = {
+    <int: Int> => Expression::IntegerLiteral(int),
+    <variable: Ident> => Expression::Variable(variable),
+}
+
+Stmt: Statement = {
+    "let" <id: Ident> "=" <expr: Expr> => Statement::Let { id, expr },
+    "dbg" "(" <expr: Expr> ")" => Statement::DebugPrint(expr),
+}
