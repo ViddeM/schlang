@@ -3,15 +3,34 @@ use crate::common_types::{Identifier};
 
 grammar;
 
-Int: i64 = <s:r"[-]?\d+"> => s.parse::<i64>().unwrap();
-Ident: Identifier = <s:r"[a-zA-Z](([a-zA-Z0-9]|-|_)*([a-zA-Z0-9]))*"> => Identifier(s.to_string());
+match {
+    "fn" => FN,
+    "let" => LET,
+    "if" => IF,
+    "else" => ELSE,
+    "dbg" => DBG,
+    r"[-]?\d+" => INT,
+    "(",
+    ")",
+    "{",
+    "}",
+    "=",
+    "",
+    r"\s*" => { }, // Ignore whitespace.
+    r#"//[^\n\r]*[\n\r]?"# => { }, // Skip `//` line comments.
+} else {
+    r"[a-zA-Z](([a-zA-Z0-9]|-|_)*([a-zA-Z0-9]))*" => ID,
+}
+
+Int: i64 = <s: INT> => s.parse::<i64>().unwrap();
+Ident: Identifier = <s:ID> => Identifier(s.to_string());
 
 pub Prgr: Program = {
     <funcs: Func*> => Program { functions: funcs }
 }
 
 Func: Function = {
-    "fn" <id: Ident> "("  ")" "{" <stmts: Stmt*> "}" => Function { name: id, statements: stmts }
+    FN <id: Ident> "("  ")" "{" <stmts: Stmt*> "}" => Function { name: id, statements: stmts }
 }
 
 Expr: Expression = {
@@ -20,6 +39,14 @@ Expr: Expression = {
 }
 
 Stmt: Statement = {
-    "let" <id: Ident> "=" <expr: Expr> => Statement::Let { id, expr },
-    "dbg" "(" <expr: Expr> ")" => Statement::DebugPrint(expr),
+    LET <id: Ident> "=" <expr: Expr> => Statement::Let { id, expr },
+    DBG "(" <expr: Expr> ")" => Statement::DebugPrint(expr),
+    IF "(" <cond: Expr> ")" <block: Block> => Statement::If { cond, block },
+    IF "(" <cond: Expr> ")" <if_block: Block> ELSE <else_block: Block> => Statement::IfElse { cond, if_block, else_block },
+    IF "(" <if_cond: Expr> ")" <if_block: Block> ELSE IF "(" <else_if_cond: Expr> ")" <else_if_block: Block> => Statement::IfElseIf { if_cond, if_block, else_if_cond, else_if_block },
+    IF "(" <if_cond: Expr> ")" <if_block: Block> ELSE IF "(" <else_if_cond: Expr> ")" <else_if_block: Block> ELSE <else_block: Block> => Statement::IfElseIfELse { if_cond, if_block, else_if_cond, else_if_block, else_block },
+}
+
+Block: Statement = {
+    "{" <stmts: Stmt*> "}" => Statement::Block(stmts)
 }

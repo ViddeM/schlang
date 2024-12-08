@@ -53,6 +53,26 @@ pub fn type_check(program: ParsedProgram) -> TypeCheckResult<Program> {
                 let typed_expr = type_check_expr(expr, &variables)?;
                 Statement::DebugPrint(typed_expr)
             }
+            ParsedStatement::If { cond, block } => todo!(),
+            ParsedStatement::IfElse {
+                cond,
+                if_block,
+                else_block,
+            } => todo!(),
+            ParsedStatement::IfElseIf {
+                if_cond,
+                if_block,
+                else_if_cond,
+                else_if_block,
+            } => todo!(),
+            ParsedStatement::IfElseIfElse {
+                if_cond,
+                if_block,
+                else_if_cond,
+                else_if_block,
+                else_block,
+            } => todo!(),
+            ParsedStatement::Block(vec) => todo!(),
         };
         typed_stmts.push(stmt);
     }

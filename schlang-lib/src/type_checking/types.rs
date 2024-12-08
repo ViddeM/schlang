@@ -13,7 +13,33 @@ pub struct Function {
 
 #[derive(Debug, Clone)]
 pub enum Statement {
-    Let { id: Identifier, expr: Expression },
+    Let {
+        id: Identifier,
+        expr: Expression,
+    },
+    If {
+        cond: Expression,
+        block: Box<Statement>,
+    },
+    IfElse {
+        cond: Expression,
+        if_block: Box<Statement>,
+        else_block: Box<Statement>,
+    },
+    IfElseIf {
+        if_cond: Expression,
+        if_block: Box<Statement>,
+        else_if_cond: Expression,
+        else_if_block: Box<Statement>,
+    },
+    IfElseIfElse {
+        if_cond: Expression,
+        if_block: Box<Statement>,
+        else_if_cond: Expression,
+        else_if_block: Box<Statement>,
+        else_block: Box<Statement>,
+    },
+    Block(Vec<Statement>),
     DebugPrint(Expression),
 }
 

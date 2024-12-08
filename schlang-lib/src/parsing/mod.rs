@@ -15,7 +15,7 @@ pub enum ParseError {
 pub fn parse(program: &str) -> Result<Program, ParseError> {
     let program = core::PrgrParser::new()
         .parse(program)
-        .or_else(|err| Err(ParseError::LalrpopError(format!("{err:?}"))))?;
+        .or_else(|err| Err(ParseError::LalrpopError(format!("{err}"))))?;
 
     Ok(program)
 }
